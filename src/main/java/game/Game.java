@@ -5,6 +5,8 @@ import player.Black;
 import player.White;
 import game.field.GameField;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -35,25 +37,32 @@ public class Game {
         }
 
     }
-    public void play() throws UnsupportedEncodingException {
+    public void play() throws IOException {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8.name());
-        out.println(gameField);
-        while (true) {
-            if (white.haveSteps(gameField)) {
-                white.step(gameField);
-                out.println(gameField);
-            }
-            else {
-                break;
-            }
+        try (FileWriter fileWriter = new FileWriter("output.txt")) {
+            fileWriter.write(gameField.toString());
+            fileWriter.write("\n");
+            while (true) {
+                if (white.haveSteps(gameField)) {
+                    white.step(gameField);
+                    fileWriter.write(gameField.toString());
+                    fileWriter.write("\n");
+                }
+                else {
+                    break;
+                }
 
-            if (black.haveSteps(gameField)) {
-                black.step(gameField);
-                out.println(gameField);
-            }
-            else {
-                break;
+                if (black.haveSteps(gameField)) {
+                    black.step(gameField);
+                    fileWriter.write(gameField.toString());
+                    fileWriter.write("\n");
+                }
+                else {
+                    break;
+                }
             }
         }
+
+
     }
 }
