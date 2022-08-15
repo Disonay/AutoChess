@@ -40,7 +40,7 @@ public abstract class AbstractFigure implements Figure{
     }
 
     @Override
-    public boolean isDifferentPlayers(Player anotherPlayer) { 
+    public boolean isDifferentPlayers(Player anotherPlayer) {
         return anotherPlayer != player;
     }
 
