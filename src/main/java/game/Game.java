@@ -1,67 +1,55 @@
 package game;
 
 import figures.Figure;
-import player.Black;
-import player.White;
 import game.field.GameField;
+import player.Black;
+import player.Player;
+import player.White;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 
 public class Game {
 
     GameField gameField = new GameField();
+
     White white = new White();
+
     Black black = new Black();
 
     public Game() {
         resetGame();
     }
 
-
     public void resetGame() {
         gameField.resetField();
 
-        white.resetFigures();
-        black.resetFigures();
-
-        for (Figure figure: white.getAvailableFigures()) {
-            gameField.placeFigure(figure);
-        }
-
-        for (Figure figure: black.getAvailableFigures()) {
-            gameField.placeFigure(figure);
-        }
-
-    }
-    public void play() throws IOException {
-        try (FileWriter fileWriter = new FileWriter("output.txt")) {
-            fileWriter.write(gameField.toString());
-            fileWriter.write("\n");
-            while (true) {
-                if (white.haveSteps(gameField)) {
-                    white.step(gameField);
-                    fileWriter.write(gameField.toString());
-                    fileWriter.write("\n");
-                }
-                else {
-                    break;
-                }
-
-                if (black.haveSteps(gameField)) {
-                    black.step(gameField);
-                    fileWriter.write(gameField.toString());
-                    fileWriter.write("\n");
-                }
-                else {
-                    break;
-                }
+        for (Player player : new Player[]{white, black}) {
+            player.resetFigures();
+            for (Figure figure : player.getAvailableFigures()) {
+                gameField.placeFigure(figure);
             }
         }
 
+    }
 
+    public void play() throws IOException {
+        try (FileWriter fileWriter = new FileWriter("output.txt")) {
+            boolean hasSteps = true;
+            while (hasSteps) {
+                for (Player player : new Player[]{white, black}) {
+                    if (player.haveSteps(gameField)) {
+                        fileWriter.write(gameField.toString());
+                        fileWriter.write("\n");
+                        player.step(gameField);
+                        fileWriter.write(gameField.toString());
+                        fileWriter.write("\n");
+                    } else {
+                        hasSteps = false;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

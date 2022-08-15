@@ -5,9 +5,12 @@ import player.Player;
 import game.field.GameField;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
-public abstract class AbstractFigure implements Figure{
+public abstract class AbstractFigure implements Figure {
+
     protected Position position;
+
     protected Player player;
 
     AbstractFigure(Position position, Player player) {
@@ -18,25 +21,30 @@ public abstract class AbstractFigure implements Figure{
     @Override
     public void step(GameField gameField) {
         for (Position possiblePosition: getPossiblePositions(gameField)) {
-            if (possiblePosition.isValid()) {
-                if (gameField.isEmpty(possiblePosition)) {
-                    gameField.dropFigure(this);
-                    changePosition(possiblePosition);
-                    gameField.placeFigure(this);
-                    break;
-                } else if (gameField.getFigure(possiblePosition).isDifferentPlayers(player)) {
-                    gameField.dropFigure(this);
-                    changePosition(possiblePosition);
-                    gameField.getFigure(possiblePosition).removeThisFigureFromPlayer();
-                    gameField.placeFigure(this);
-                    break;
-                }
+            if (!possiblePosition.isValid()) {
+                continue;
+            }
+            if (gameField.isEmpty(possiblePosition)) {
+                gameField.dropFigure(this);
+                changePosition(possiblePosition);
+                gameField.placeFigure(this);
+                break;
+            }
+            if (gameField.getFigure(possiblePosition).isDifferentPlayers(player)) {
+                gameField.dropFigure(this);
+                changePosition(possiblePosition);
+                gameField.getFigure(possiblePosition).removeThisFigureFromPlayer();
+                gameField.placeFigure(this);
+                break;
             }
         }
     }
     @Override
     public boolean canMove(GameField gameField) {
-        return getPossiblePositions(gameField).stream().anyMatch(x -> x.isValid() && (gameField.isEmpty(x) || gameField.getFigure(x).isDifferentPlayers(player)));
+        Predicate<Position> isCanMove =
+                x -> x.isValid() && (gameField.isEmpty(x) || gameField.getFigure(x).isDifferentPlayers(player));
+        return getPossiblePositions(gameField).stream()
+                .anyMatch(isCanMove);
     }
 
     @Override
@@ -54,8 +62,9 @@ public abstract class AbstractFigure implements Figure{
         if (this == obj) {
             return true;
         }
-        if (obj instanceof Figure) {
-            return (this.position.vertical() == ((Figure) obj).getVerticalPosition()) && (this.position.horizontal() == ((Figure) obj).getHorizontalPosition());
+        if (obj instanceof Figure other) {
+            return (this.position.vertical() == other.getVerticalPosition())
+                    && (this.position.horizontal() == other.getHorizontalPosition());
         }
         return false;
     }
