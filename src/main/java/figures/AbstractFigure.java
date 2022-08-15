@@ -40,7 +40,7 @@ public abstract class AbstractFigure implements Figure{
     }
 
     @Override
-    public boolean isDifferentPlayers(Player anotherPlayer) {
+    public boolean isDifferentPlayers(Player anotherPlayer) { 
         return anotherPlayer != player;
     }
 
@@ -77,17 +77,22 @@ public abstract class AbstractFigure implements Figure{
 
     protected ArrayList<Position> possiblePositionsFromOneDirection(int verticalStep, int horizontalStep, GameField gameField) {
         ArrayList<Position> possiblePositions = new ArrayList<>();
-        Position variant = new Position(getVerticalPosition() + verticalStep, getHorizontalPosition() + horizontalStep);
+
+        Position variant = new Position(
+                getVerticalPosition() + verticalStep,
+                getHorizontalPosition() + horizontalStep);
         while (variant.isValid() && gameField.isEmpty(variant)) {
             possiblePositions.add(variant);
-            variant = new Position(variant.vertical() + verticalStep, variant.horizontal() + horizontalStep);
+            variant = new Position(
+                    variant.vertical() + verticalStep,
+                    variant.horizontal() + horizontalStep);
         }
-        if (variant.isValid() && !gameField.isEmpty(variant) && gameField.getFigure(variant).isDifferentPlayers(player)) {
+        if (variant.isValid() &&
+                !gameField.isEmpty(variant) &&
+                gameField.getFigure(variant).isDifferentPlayers(player)) {
             possiblePositions.add(variant);
         }
 
         return possiblePositions;
     }
-
-
 }

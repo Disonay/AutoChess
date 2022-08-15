@@ -9,7 +9,6 @@ import java.util.Collections;
 
 public class Horse extends AbstractFigure {
 
-
     public Horse(Position position, Player player) {
         super(position, player);
     }

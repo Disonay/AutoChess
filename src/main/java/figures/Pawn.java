@@ -61,7 +61,9 @@ public class Pawn extends AbstractFigure {
                         gameField.placeFigure(this);
                     }
                     break;
-                } else if (!gameField.isEmpty(possiblePosition) && gameField.getFigure(possiblePosition).isDifferentPlayers(player) && possiblePosition.horizontal() != getHorizontalPosition()) {
+                } else if (!gameField.isEmpty(possiblePosition) &&
+                        gameField.getFigure(possiblePosition).isDifferentPlayers(player) &&
+                        possiblePosition.horizontal() != getHorizontalPosition()) {
                     if (isQueen(possiblePosition)) {
                         toQueen(possiblePosition, gameField);
                     } else {
@@ -78,7 +80,11 @@ public class Pawn extends AbstractFigure {
 
     @Override
     public boolean canMove(GameField gameField) {
-        return getPossiblePositions(gameField).stream().anyMatch(x -> x.isValid() && ((gameField.isEmpty(x) && x.horizontal() == getHorizontalPosition()) || (!gameField.isEmpty(x) && gameField.getFigure(x).isDifferentPlayers(player) && x.horizontal() != getHorizontalPosition())));
+        return getPossiblePositions(gameField).stream().anyMatch(x -> x.isValid() &&
+                ((gameField.isEmpty(x) && x.horizontal() == getHorizontalPosition()) ||
+                        (!gameField.isEmpty(x) &&
+                                gameField.getFigure(x).isDifferentPlayers(player) &&
+                                x.horizontal() != getHorizontalPosition())));
     }
 
     @Override

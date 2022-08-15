@@ -38,7 +38,6 @@ public class Game {
 
     }
     public void play() throws IOException {
-        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8.name());
         try (FileWriter fileWriter = new FileWriter("output.txt")) {
             fileWriter.write(gameField.toString());
             fileWriter.write("\n");
