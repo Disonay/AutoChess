@@ -16,10 +16,10 @@ public class Eliphant extends AbstractFigure {
     @Override
     public ArrayList<Position> getPossiblePositions(GameField gameField) {
         ArrayList<Position> possiblePositions = new ArrayList<>();
-        possiblePositions.addAll(possiblePositionsFromOneDirection(1, 1, gameField));
-        possiblePositions.addAll(possiblePositionsFromOneDirection(1, -1, gameField));
-        possiblePositions.addAll(possiblePositionsFromOneDirection(-1, 1, gameField));
-        possiblePositions.addAll(possiblePositionsFromOneDirection(-1, -1, gameField));
+        possiblePositions.addAll(possibleUpRightDirection(gameField));
+        possiblePositions.addAll(possibleUpLeftDirection(gameField));
+        possiblePositions.addAll(possibleDownRightDirection(gameField));
+        possiblePositions.addAll(possibleDownLeftDirection(gameField));
 
         Collections.shuffle(possiblePositions);
 

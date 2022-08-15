@@ -8,6 +8,7 @@ import game.field.GameField;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Predicate;
 
 
 public class Pawn extends AbstractFigure {
@@ -31,60 +32,57 @@ public class Pawn extends AbstractFigure {
         return possiblePositions;
     }
 
-    private boolean isQueen(Position newPosition) {
+    private boolean isQueen() {
         if (player instanceof White) {
-            return newPosition.vertical() == 7;
+            return position.vertical() == 7;
         } else if (player instanceof Black) {
-            return newPosition.vertical() == 0;
+            return position.vertical() == 0;
         }
         return false;
     }
 
-    private void toQueen(Position newPosition, GameField gameField) {
-        gameField.getFigure(position).removeThisFigureFromPlayer();
-        Figure queen = new Queen(newPosition, player);
-        player.addFigure(queen);
-        gameField.placeFigure(queen);
+    private void toQueen(GameField gameField) {
+        removeThisFigureFromPlayer();
         gameField.dropFigure(this);
+
+        Figure queen = new Queen(position, player);
+        player.addFigure(queen);
     }
 
     @Override
     public void step(GameField gameField) {
         for (Position possiblePosition : getPossiblePositions(gameField)) {
             if (possiblePosition.isValid()) {
-                if (gameField.isEmpty(possiblePosition) && possiblePosition.horizontal() == getHorizontalPosition()) {
-                    if (isQueen(possiblePosition)) {
-                        toQueen(possiblePosition, gameField);
-                    } else {
-                        gameField.dropFigure(this);
-                        changePosition(possiblePosition);
-                        gameField.placeFigure(this);
-                    }
-                    break;
-                } else if (!gameField.isEmpty(possiblePosition) &&
+                if (!gameField.isEmpty(possiblePosition) &&
                         gameField.getFigure(possiblePosition).isDifferentPlayers(player) &&
                         possiblePosition.horizontal() != getHorizontalPosition()) {
-                    if (isQueen(possiblePosition)) {
-                        toQueen(possiblePosition, gameField);
-                    } else {
-                        gameField.dropFigure(this);
-                        changePosition(possiblePosition);
-                        gameField.getFigure(possiblePosition).removeThisFigureFromPlayer();
-                        gameField.placeFigure(this);
-                    }
-                    break;
+                    gameField.getFigure(possiblePosition).removeThisFigureFromPlayer();
                 }
+                else if (gameField.isEmpty(possiblePosition) &&
+                        possiblePosition.horizontal() != getHorizontalPosition()) {
+                    continue;
+                }
+
+                gameField.dropFigure(this);
+                changePosition(possiblePosition);
+                if (isQueen()) {
+                    toQueen(gameField);
+                }
+                gameField.placeFigure(this);
+                break;
             }
         }
     }
-
     @Override
     public boolean canMove(GameField gameField) {
-        return getPossiblePositions(gameField).stream().anyMatch(x -> x.isValid() &&
-                ((gameField.isEmpty(x) && x.horizontal() == getHorizontalPosition()) ||
-                        (!gameField.isEmpty(x) &&
-                                gameField.getFigure(x).isDifferentPlayers(player) &&
-                                x.horizontal() != getHorizontalPosition())));
+        Predicate<Position> isValid = Position::isValid;
+        Predicate<Position> isMoveToFreeCell = x -> gameField.isEmpty(x) && x.horizontal() == getHorizontalPosition();
+        Predicate<Position> isMoveToEnemyFigure = x -> !gameField.isEmpty(x) &&
+                gameField.getFigure(x).isDifferentPlayers(player) &&
+                x.horizontal() != getHorizontalPosition();
+
+        return getPossiblePositions(gameField).stream()
+                .anyMatch(isValid.and(isMoveToFreeCell.or(isMoveToEnemyFigure)));
     }
 
     @Override

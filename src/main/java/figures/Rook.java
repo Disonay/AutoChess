@@ -15,10 +15,10 @@ public class Rook extends AbstractFigure {
     @Override
     public ArrayList<Position> getPossiblePositions(GameField gameField) {
         ArrayList<Position> possiblePositions = new ArrayList<>();
-        possiblePositions.addAll(possiblePositionsFromOneDirection(1, 0, gameField));
-        possiblePositions.addAll(possiblePositionsFromOneDirection(-1, 0, gameField));
-        possiblePositions.addAll(possiblePositionsFromOneDirection(0, 1, gameField));
-        possiblePositions.addAll(possiblePositionsFromOneDirection(0, -1, gameField));
+        possiblePositions.addAll(possibleUpDirection(gameField));
+        possiblePositions.addAll(possibleDownDirection(gameField));
+        possiblePositions.addAll(possibleRightDirection(gameField));
+        possiblePositions.addAll(possibleLeftDirection(gameField));
 
         Collections.shuffle(possiblePositions);
 

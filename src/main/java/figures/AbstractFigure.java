@@ -21,19 +21,13 @@ public abstract class AbstractFigure implements Figure {
     @Override
     public void step(GameField gameField) {
         for (Position possiblePosition: getPossiblePositions(gameField)) {
-            if (!possiblePosition.isValid()) {
-                continue;
-            }
-            if (gameField.isEmpty(possiblePosition)) {
+            if (possiblePosition.isValid()) {
                 gameField.dropFigure(this);
+                if (!gameField.isEmpty(possiblePosition) &&
+                        gameField.getFigure(possiblePosition).isDifferentPlayers(player)) {
+                    gameField.getFigure(possiblePosition).removeThisFigureFromPlayer();
+                }
                 changePosition(possiblePosition);
-                gameField.placeFigure(this);
-                break;
-            }
-            if (gameField.getFigure(possiblePosition).isDifferentPlayers(player)) {
-                gameField.dropFigure(this);
-                changePosition(possiblePosition);
-                gameField.getFigure(possiblePosition).removeThisFigureFromPlayer();
                 gameField.placeFigure(this);
                 break;
             }
@@ -41,10 +35,12 @@ public abstract class AbstractFigure implements Figure {
     }
     @Override
     public boolean canMove(GameField gameField) {
-        Predicate<Position> isCanMove =
-                x -> x.isValid() && (gameField.isEmpty(x) || gameField.getFigure(x).isDifferentPlayers(player));
+        Predicate<Position> isValid = Position::isValid;
+        Predicate<Position> isMoveToEmptyCell = gameField::isEmpty;
+        Predicate<Position> isMoveToEnemyFigure = x -> gameField.getFigure(x).isDifferentPlayers(player);
+
         return getPossiblePositions(gameField).stream()
-                .anyMatch(isCanMove);
+                .anyMatch(isValid.and(isMoveToEmptyCell.or(isMoveToEnemyFigure)));
     }
 
     @Override
@@ -84,7 +80,8 @@ public abstract class AbstractFigure implements Figure {
         this.position = position;
     }
 
-    protected ArrayList<Position> possiblePositionsFromOneDirection(int verticalStep, int horizontalStep, GameField gameField) {
+    private ArrayList<Position>
+    possiblePositionsFromOneDirection(int verticalStep, int horizontalStep, GameField gameField) {
         ArrayList<Position> possiblePositions = new ArrayList<>();
 
         Position variant = new Position(
@@ -103,5 +100,37 @@ public abstract class AbstractFigure implements Figure {
         }
 
         return possiblePositions;
+    }
+
+    protected ArrayList<Position> possibleUpDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(1, 0, gameField);
+    }
+
+    protected ArrayList<Position> possibleDownDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(-1, 0, gameField);
+    }
+
+    protected ArrayList<Position> possibleRightDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(0, 1, gameField);
+    }
+
+    protected ArrayList<Position> possibleLeftDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(0, -1, gameField);
+    }
+
+    protected ArrayList<Position> possibleUpRightDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(1, 1, gameField);
+    }
+
+    protected ArrayList<Position> possibleUpLeftDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(1, -1, gameField);
+    }
+
+    protected ArrayList<Position> possibleDownRightDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(-1, 1, gameField);
+    }
+
+    protected ArrayList<Position> possibleDownLeftDirection(GameField gameField) {
+        return possiblePositionsFromOneDirection(-1, -1, gameField);
     }
 }

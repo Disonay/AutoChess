@@ -35,12 +35,12 @@ public class Game {
 
     public void play() throws IOException {
         try (FileWriter fileWriter = new FileWriter("output.txt")) {
+            fileWriter.write(gameField.toString());
+            fileWriter.write("\n");
             boolean hasSteps = true;
             while (hasSteps) {
                 for (Player player : new Player[]{white, black}) {
                     if (player.haveSteps(gameField)) {
-                        fileWriter.write(gameField.toString());
-                        fileWriter.write("\n");
                         player.step(gameField);
                         fileWriter.write(gameField.toString());
                         fileWriter.write("\n");
